@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Livros - Biblioteca</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>    <script type="text/javascript" src="public/lib/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="public/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="public/lib/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script type="text/javascript" src="public/lib/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="public/lib/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+    <script type="text/javascript" src="public/lib/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="public/lib/datatables.net-buttons/js/buttons.flash.min.js"></script>
+    <script type="text/javascript" src="public/lib/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="public/lib/sweetalert2-11.4.19/css/sweetalert2.min.css" />
+    <script type="text/javascript" charset="utf-8" src="public/lib/sweetalert2-11.4.19/js/sweetalert2.min.js"></script>
+    <script type="text/javascript" src="public/lib/datatables.net-select/js/dataTables.select.min.js"></script>
+    <script type="text/javascript" src="public/js/datatables-custom.js"></script>
+    <link rel="stylesheet" type="text/css" href="public/lib/datatables.net-bs4/css/dataTables.bootstrap4.min.css" />
+    <link rel="stylesheet" type="text/css" href="public/lib/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" />
+    <link rel="stylesheet" type="text/css" href="public/lib/datatables.net-select-bs4/css/select.bootstrap4.min.css" />
+    <link rel="stylesheet" type="text/css" href="public/lib/fontawesome-free/css/all.min.css" />
+    <link rel="stylesheet" type="text/css" href="public/css/style.css" media="screen" />
+    <script src="public/js/main.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="#">Biblioteca</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a class="nav-item nav-link" href="index.html">Início</a>
+            <a class="nav-item nav-link active" href="livros.html">Listar Livros <span class="sr-only">(current)</span></a>
+            <a class="nav-item nav-link" href="cadastrar.html">Cadastrar Livro</a>
+          </div>
+        </div>
+      </nav>
+    <div class="limitador">
+        <div class="card tabela-container" >
+            <div style="text-align: center; padding-top: 10px;">
+                <h1 style="color: #007bff;">Livros</h1>
+            </div>
+            <div class="card-body">
+                <div id="tabela-container" >
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        	//<![CDATA[
+            buscarDados();
+            async function buscarDados() {
+                let dados;
+                const response = await fetch("http://localhost:8080/livros");
+                if (!response.ok) {
+                        processando = false;
+                        Swal.close();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Ops..',
+                            text: `Ocorreu um erro.`
+                        });
+                        return;
+                    }
+                try {
+                    Swal.close();
+                    dados = await response.json();
+                    criarTabela(dados);
+                } catch (ex) {
+                    Swal.close();
+                    Swal.fire({
+                            icon: 'error',
+                            title: 'Ops..',
+                            text: `ERRO: ` + ex.message
+                        });
+                    return;
+                }
+                
+            }
+            function criarTabela(dados) {
+                document.getElementById("tabela-container").innerHTML = '<table id="tabela" class="table table-striped table-hover"></table>';
+                var tabela = $("#tabela").DataTable({
+                        autoWidth: false,
+                        searching: true,
+                        language: tableLanguagePtBr,
+                        order: [
+                            [2, "asc"]
+                        ],
+                        columns: [
+                            { title: "", "class": "col-min", searchable: false, orderable: false, data: "id", render: function (v, type, row) { return ' <a target="_blank" title="Editar" href="editar.html?id=' + row.id + '" class="btn btn-sm btn-outline-primary"><i class="fa fa-fw fa-edit"></i></a> <button title="Excluir" type="button" data-excluir="1" class="btn btn-sm btn-outline-danger"><i class="fa fa-fw fa-times"></i></button>'; } },
+                            { title: "#", orderable: false, type: "text", data: "id" },
+                            { title: "Título", type:"text", data: "titulo" },
+                            { title: "Autor", type:"text", data: "autor" },
+                            { title: "Editora", type:"date", data: "editora" },
+                            { title: "Ano", type:"number", data: "ano" },
+                            { title: "Preço", type:"number", data: "preco" },
+
+                            
+                        ],
+                        data: dados,
+                });
+            $("#tabela").on("click", "tbody button", function () {
+
+                    var trClicada = this.parentNode.parentNode,
+                        nome = null,
+                        livro = tabela.row(trClicada).data();
+                    
+                    if (this.getAttribute("data-excluir")) {
+                        Swal.fire({
+                            title: 'Excluir',
+                            icon: 'warning',
+                            text: `Você tem certeza que deseja excluir o livro '${livro.titulo}'? Essa ação não poderá ser desfeita!`,
+                            showDenyButton: true,
+                            confirmButtonText: 'Sim',
+                            denyButtonText: `Cancelar`,
+                        }).then(async (result) => {
+                            if (result.isConfirmed) {
+                                try {
+                                    const response = await fetch(`http://localhost:8080/livros/${livro.id}`, {
+                                        method: "DELETE",
+                                        headers: {
+                                            "Content-Type": "application/json"
+                                        }
+                                    });
+
+                                    if(response.ok){
+                                        Swal.fire({
+                                        icon: 'success',
+                                        title: 'Livro deletado com sucesso!',
+                                        text: `O livro ${livro.titulo} foi deletado com sucesso!`
+                                        });
+                                        tabela.row(trClicada).remove().draw();
+                                    }else{
+                                        Swal.fire({
+                                        icon: 'error',
+                                        title: 'Oops..',
+                                        text: `Deu um erro ao deletar o livro!`
+                                        });
+                                    }
+                                } catch (ex) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Ops..',
+                                        text: `Erro ao deletar! \n ERRO: ${ex.message}`
+                                    });
+                                }
+                                    
+                            }else {
+                                Swal.close();
+                            }
+                        })
+                    }
+                });
+            }
+            
+        //]]>
+    </script>
+</body>
+</html>

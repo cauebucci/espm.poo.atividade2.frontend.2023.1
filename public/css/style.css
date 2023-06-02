@@ -1,0 +1,18 @@
+.limitador {
+    justify-content: start;
+}
+
+.tabela-container {
+    margin-top: 100px;
+    margin-right: 200px;
+    margin-left: 200px;
+}
+
+.cadastro-error{
+    padding-top: 1px;
+    padding-bottom: 1px ;
+    margin: 0px;
+    font-size: 10px;
+    font-weight: 700;
+    color: red;
+}
